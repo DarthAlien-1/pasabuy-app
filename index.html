@@ -44,8 +44,28 @@
   header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:22px;}
   .brand-eyebrow{
     font-family:'IBM Plex Mono',monospace;
-    font-size:13px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--ink-soft);margin-bottom:6px;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:6px;
+    word-break:break-word;
+  }
+  .brand-eyebrow a{
+    color:var(--navy);
+    text-decoration:none;
+    font-weight:500;
+    border-bottom:1px solid transparent;
+  }
+  .brand-eyebrow a:hover{
+    color:var(--red);
+    border-bottom-color:var(--red);
+  }
+  .brand-eyebrow .divider{
+    opacity:0.4;
+    user-select:none;
   }
   h1{
     font-family:'Space Grotesk',sans-serif;
@@ -261,7 +281,7 @@
   @media (max-width: 640px){
     .wrap{width:100%;padding:14px 10px 90px;}
     h1{font-size:28px;}
-    .brand-eyebrow{font-size:11.5px;}
+    .brand-eyebrow{font-size:11px;gap:4px;}
     header{gap:12px;}
     .rate-box{min-width:0;width:100%;}
     .stats{grid-template-columns:repeat(2,1fr);gap:8px;}
@@ -302,7 +322,15 @@
   <div class="manifest-border"></div>
   <header>
     <div>
-      <div class="brand-eyebrow">https://www.instagram.com/channel/Aba7EKeF_89kEzer/ || @redr.detiquez @redrdetiquez_ @slaywithrics</div>
+      <div class="brand-eyebrow">
+        <a href="https://www.instagram.com/channel/Aba7EKeF_89kEzer/" target="_blank" rel="noopener">IG Broadcast Channel</a>
+        <span class="divider">/</span>
+        <a href="https://instagram.com/redr.detiquez" target="_blank" rel="noopener">@redr.detiquez</a>
+        <span class="divider">/</span>
+        <a href="https://instagram.com/redrdetiquez_" target="_blank" rel="noopener">@redrdetiquez_</a>
+        <span class="divider">/</span>
+        <a href="https://instagram.com/slaywithrics" target="_blank" rel="noopener">@slaywithrics</a>
+      </div>
       <h1>KOREA PASABUY</h1>
       <div class="route"><span>SEOUL</span><span class="arrow">✈</span><span>MANILA</span><span class="dot"></span><span id="orderCount">0 orders</span></div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);margin-top:4px;">Shared tracker</div>
@@ -653,9 +681,9 @@ function renderCustomers(){
       const iid = row.dataset.item;
       const item = cust.items.find(x=>x.id===iid);
       row.querySelector('.i-product').oninput = e=>{ item.product=e.target.value; renderStock(); scheduleSave(); };
-      row.querySelector('.i-krw').oninput = e=>{ item.krw=e.target.value; renderAll(); scheduleSave(); };
-      row.querySelector('.i-sell').oninput = e=>{ item.sell=e.target.value; renderAll(); scheduleSave(); };
-      row.querySelector('.i-qty').oninput = e=>{ item.qty=e.target.value; renderAll(); scheduleSave(); };
+      row.querySelector('.i-krw').oninput = e=>{ item.krw=e.target.value; renderStats(); scheduleSave(); };
+      row.querySelector('.i-sell').oninput = e=>{ item.sell=e.target.value; renderStats(); scheduleSave(); };
+      row.querySelector('.i-qty').oninput = e=>{ item.qty=e.target.value; renderStats(); renderStock(); scheduleSave(); };
       row.querySelector('.i-details').oninput = e=>{ item.details=e.target.value; scheduleSave(); };
       row.querySelector('[data-field="bought"]').onclick = ()=>{
         const next = cycle(BOUGHT_STATES,item.bought||'Not Yet');

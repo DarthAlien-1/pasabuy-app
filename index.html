@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Korea Pasabuy — Manifest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF0E9;
+    --card:#FFFFFF;
+    --ink:#1C2530;
+    --ink-soft:#69707C;
+    --red:#C23B2E;
+    --red-soft:#F3DEDA;
+    --jade:#3F7D68;
+    --jade-soft:#DCEAE3;
+    --gold:#A87A21;
+    --gold-soft:#F2E6C9;
+    --navy:#22344A;
+    --line:#D9DBD1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
+
+  /* ---- header / manifest strip ---- */
+  .manifest-border{
+    height:8px;
+    background:repeating-linear-gradient(45deg,var(--red) 0 14px,var(--navy) 14px 28px, #fff 28px 30px);
+    border-radius:3px;
+    margin-bottom:18px;
+    opacity:.9;
+  }
+  header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:22px;}
+  .brand-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:6px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:34px;font-weight:700;margin:0;letter-spacing:-.01em;
+  }
+  .route{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);
+    display:flex;align-items:center;gap:8px;margin-top:6px;
+  }
+  .route .dot{width:5px;height:5px;border-radius:50%;background:var(--red);}
+  .route .arrow{color:var(--red);}
+
+  .rate-box{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:10px 14px;display:flex;flex-direction:column;gap:4px;min-width:210px;
+  }
+  .rate-box label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .rate-row{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:14px;}
+  .rate-row input{
+    width:70px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;
+    font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink);
+  }
+
+  /* ---- summary tags ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:26px;}
+  .stat{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;position:relative;overflow:hidden;
+  }
+  .stat::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent,var(--navy));
+  }
+  .stat .label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;}
+  .stat .value{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
+
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;}
+  .tab{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+    padding:10px 16px;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;
+    background:none;border-top:none;border-left:none;border-right:none;
+  }
+  .tab.active{color:var(--ink);border-bottom-color:var(--red);font-weight:600;}
+
+  section{display:none;}
+  section.active{display:block;}
+
+  /* ---- table ---- */
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);}
+  table{border-collapse:collapse;width:100%;min-width:1080px;font-size:13px;}
+  th{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-soft);text-align:left;padding:10px 10px;border-bottom:1px solid var(--line);
+    background:#F7F7F3;position:sticky;top:0;
+  }
+  td{padding:7px 10px;border-bottom:1px solid #EEEFEA;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  td input, td textarea{
+    width:100%;border:1px solid transparent;background:transparent;font-family:'Inter',sans-serif;
+    font-size:13px;padding:5px 6px;border-radius:5px;color:var(--ink);
+  }
+  td input:hover, td textarea:hover{border-color:var(--line);}
+  td input:focus, td textarea:focus{outline:none;border-color:var(--navy);background:#fff;}
+  td input.num{font-family:'IBM Plex Mono',monospace;text-align:right;}
+  .idx{font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);text-align:center;}
+  .computed{font-family:'IBM Plex Mono',monospace;white-space:nowrap;}
+  .profit-pos{color:var(--jade);}
+  .profit-neg{color:var(--red);}
+
+  .stamp{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+    padding:4px 9px;border-radius:999px;border:1.4px solid currentColor;cursor:pointer;
+    display:inline-block;white-space:nowrap;user-select:none;background:transparent;
+  }
+  .stamp.paid{color:var(--jade);}
+  .stamp.partial{color:var(--gold);}
+  .stamp.unpaid{color:var(--red);}
+  .stamp.bought{color:var(--jade);}
+  .stamp.notyet{color:var(--ink-soft);}
+  .stamp.delivered{color:var(--jade);}
+  .stamp.transit{color:var(--gold);}
+  .stamp.notshipped{color:var(--ink-soft);}
+
+  .del-btn{
+    border:none;background:none;color:var(--ink-soft);cursor:pointer;font-size:15px;padding:2px 6px;border-radius:5px;
+  }
+  .del-btn:hover{color:var(--red);background:var(--red-soft);}
+
+  .add-row{
+    display:flex;align-items:center;gap:8px;margin-top:12px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+  }
+  .add-btn{
+    background:var(--ink);color:#fff;border:none;border-radius:7px;padding:9px 16px;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.03em;
+  }
+  .add-btn:hover{background:var(--navy);}
+
+  /* customer groups (orders) */
+  .orders-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .orders-toolbar input, .orders-toolbar select{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--card);
+  }
+  #searchInput{flex:1;min-width:180px;}
+  .customer-card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    margin-bottom:14px;overflow:hidden;
+  }
+  .customer-head{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:12px 14px;background:#F7F7F3;border-bottom:1px solid var(--line);
+  }
+  .customer-head input.cname{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;
+    border:none;background:none;flex:1;min-width:140px;color:var(--ink);padding:2px 0;
+  }
+  .customer-head input.cname:focus{outline:none;}
+  .customer-head input.cdate{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:#fff;
+  }
+  .customer-meta{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .customer-subtotal{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);
+  }
+  .customer-subtotal b{color:var(--ink);}
+  .items-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .items-table th{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--ink-soft);text-align:left;padding:7px 10px;border-bottom:1px solid #EEEFEA;
+  }
+  .items-table td{padding:6px 10px;border-bottom:1px solid #F2F3EF;}
+  .items-table tr:last-child td{border-bottom:none;}
+  .items-table input{
+    width:100%;border:1px solid transparent;background:transparent;font-family:'Inter',sans-serif;
+    font-size:13px;padding:5px 6px;border-radius:5px;color:var(--ink);
+  }
+  .items-table input.num{font-family:'IBM Plex Mono',monospace;text-align:right;}
+  .items-table input:hover{border-color:var(--line);}
+  .items-table input:focus{outline:none;border-color:var(--navy);background:#fff;}
+  .item-add-row{padding:8px 14px 12px;}
+  .item-add-row button{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);
+    background:none;border:1px dashed var(--line);border-radius:7px;padding:6px 12px;cursor:pointer;
+  }
+  .item-add-row button:hover{color:var(--ink);border-color:var(--ink-soft);}
+  .customer-head .del-btn{font-size:14px;}
+
+  .log-section{border-top:1px solid var(--line);padding:10px 14px 12px;background:#FBFBF8;}
+  .log-toggle{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);cursor:pointer;
+    letter-spacing:.04em;text-transform:uppercase;user-select:none;
+  }
+  .log-toggle:hover{color:var(--ink);}
+  .log-entries{margin:8px 0;padding:0;list-style:none;display:none;}
+  .log-entries.open{display:block;}
+  .log-entries li{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);
+    padding:3px 0;border-bottom:1px dashed #E5E6DF;
+  }
+  .log-entries li:last-child{border-bottom:none;}
+  .log-entries li b{color:var(--ink);}
+  .log-add{display:none;gap:6px;margin-top:8px;}
+  .log-add.open{display:flex;}
+  .log-add input{
+    flex:1;font-family:'Inter',sans-serif;font-size:12.5px;border:1px solid var(--line);
+    border-radius:6px;padding:6px 8px;
+  }
+  .log-add button{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;border:none;background:var(--ink);
+    color:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;
+  }
+
+  /* stock cards */
+  .stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .stock-card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;position:relative;
+  }
+  .stock-card input.pname{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;border:none;background:none;
+    width:100%;padding:0 0 6px;color:var(--ink);
+  }
+  .stock-card input.pname:focus{outline:none;}
+  .stock-row{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);margin-top:6px;}
+  .stock-row input.pqty{width:60px;text-align:right;font-family:'IBM Plex Mono',monospace;border:1px solid var(--line);border-radius:5px;padding:2px 5px;}
+  .remaining{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;margin-top:8px;}
+  .remaining.low{color:var(--red);}
+  .remaining.ok{color:var(--jade);}
+  .stock-card .del-btn{position:absolute;top:10px;right:10px;}
+
+  footer.savebar{
+    position:fixed;bottom:0;left:0;right:0;text-align:center;padding:8px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);
+    background:linear-gradient(to top, var(--bg) 60%, transparent);
+  }
+
+  ::placeholder{color:#B7BBB0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="manifest-border"></div>
+  <header>
+    <div>
+      <div class="brand-eyebrow">Parcel Manifest No. 001</div>
+      <h1>KOREA PASABUY</h1>
+      <div class="route"><span>SEOUL</span><span class="arrow">✈</span><span>MANILA</span><span class="dot"></span><span id="orderCount">0 orders</span></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);margin-top:4px;">Shared tracker — anyone with this link sees the same live data.</div>
+    </div>
+    <div class="rate-box">
+      <label>Today's Rate</label>
+      <div class="rate-row">
+        <span>₩1,000 =</span>
+        <span>₱</span>
+        <input type="number" step="0.01" id="rateInput" value="41.5">
+      </div>
+    </div>
+  </header>
+
+  <div class="stats" id="statsRow"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="orders">Orders</button>
+    <button class="tab" data-tab="stock">Stock</button>
+    <button class="tab" data-tab="expenses">Red's Gastos</button>
+  </div>
+
+  <section id="orders" class="active">
+    <div class="orders-toolbar">
+      <input type="text" id="searchInput" placeholder="Search customer or item…">
+      <select id="filterSelect">
+        <option value="all">All</option>
+        <option value="unpaid">Unpaid</option>
+        <option value="partial">Partial payment</option>
+        <option value="paid">Paid</option>
+        <option value="notshipped">Not shipped</option>
+        <option value="transit">In transit</option>
+        <option value="delivered">Delivered</option>
+      </select>
+      <select id="sortSelect">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="balance">Highest balance</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </div>
+    <div id="customerList"></div>
+    <div class="add-row"><button class="add-btn" id="addCustomer">+ Add customer</button></div>
+  </section>
+
+  <section id="stock">
+    <div class="stock-grid" id="stockGrid"></div>
+    <div class="add-row"><button class="add-btn" id="addStock">+ Add product</button></div>
+  </section>
+
+  <section id="expenses">
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Item</th><th>Price (KRW)</th><th>Price (₱)</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="expensesBody"></tbody>
+      </table>
+    </div>
+    <div class="add-row"><button class="add-btn" id="addExpense">+ Add expense</button></div>
+  </section>
+</div>
+<footer class="savebar" id="saveStatus">Loaded.</footer>
+
+<script>
+let data = { customers: [], stock: [], expenses: [], rate: 41.5 };
+let saveTimer = null;
+
+// migrate old flat "orders" shape (one row per item, no grouping) into customers[]
+function migrateIfNeeded(){
+  if(data.orders && data.orders.length && (!data.customers || data.customers.length===0)){
+    const byName = {};
+    const order = [];
+    data.orders.forEach(o=>{
+      const key = (o.name||'').trim().toLowerCase() || ('_'+o.id);
+      if(!byName[key]){
+        byName[key] = {id:uid(), name:o.name||'', payment:o.payment||'Unpaid', shipping:o.shipping||'Not Shipped', items:[]};
+        order.push(byName[key]);
+      }
+      byName[key].items.push({id:o.id, product:o.product||'', krw:o.krw||'', sell:o.sell||'', qty:o.qty||1, bought:o.bought||'Not Yet', details:o.details||''});
+    });
+    data.customers = order;
+  }
+  if(!data.customers) data.customers = [];
+  data.customers.forEach(c=>{
+    if(!c.date) c.date = '';
+    if(!c.log) c.log = [];
+  });
+  delete data.orders;
+}
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function peso(n){ return '₱' + (isFinite(n)?n:0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function won(n){ return '₩' + Math.round(isFinite(n)?n:0).toLocaleString('en-US'); }
+
+async function loadData(){
+  try{
+    const res = await fetch('/api/data');
+    const json = await res.json();
+    if(json && json.value){
+      data = Object.assign({customers:[],stock:[],expenses:[],rate:41.5}, json.value);
+    }
+  }catch(e){ setStatus('Could not reach server — check your connection and reload.'); }
+  migrateIfNeeded();
+  document.getElementById('rateInput').value = data.rate;
+  renderAll();
+  setStatus('Loaded.');
+}
+
+function scheduleSave(){
+  setStatus('Saving…');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{
+      const res = await fetch('/api/data', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      setStatus(res.ok ? 'Saved · ' + new Date().toLocaleTimeString() : 'Save failed');
+    }catch(e){ setStatus('Save failed — check your connection'); }
+  }, 450);
+}
+function setStatus(msg){ document.getElementById('saveStatus').textContent = msg; }
+
+function liveP(krw){ return (Number(krw)||0) * (data.rate/1000); }
+
+function renderAll(){
+  renderStats();
+  renderCustomers();
+  renderStock();
+  renderExpenses();
+}
+
+function allItems(){
+  // flat list of {..item, customerName} across every customer, for stats/stock matching
+  const out = [];
+  data.customers.forEach(c=> c.items.forEach(it=> out.push(Object.assign({}, it, {_customer:c}))));
+  return out;
+}
+
+function renderStats(){
+  let totalProfit=0, totalPasabuy=0, totalKrwPurchased=0, totalPhpPurchased=0, totalExpenses=0;
+  allItems().forEach(it=>{
+    const lp = liveP(it.krw), qty = Number(it.qty)||0, sell = Number(it.sell)||0;
+    totalProfit += (sell - lp) * qty;
+    totalPasabuy += sell * qty;
+    totalKrwPurchased += (Number(it.krw)||0) * qty;
+    totalPhpPurchased += lp * qty;
+  });
+  data.expenses.forEach(e=>{ totalExpenses += Number(e.php)||0; });
+
+  const stats = [
+    {label:'Total Profit', value:peso(totalProfit), accent:'var(--jade)'},
+    {label:'Total Pasabuy Amount', value:peso(totalPasabuy), accent:'var(--navy)'},
+    {label:'Purchased (KRW)', value:won(totalKrwPurchased), accent:'var(--gold)'},
+    {label:'Purchased (₱)', value:peso(totalPhpPurchased), accent:'var(--navy)'},
+    {label:"Red's Gastos", value:peso(totalExpenses), accent:'var(--red)'},
+  ];
+  document.getElementById('statsRow').innerHTML = stats.map(s=>
+    `<div class="stat" style="--accent:${s.accent}"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>`
+  ).join('');
+  document.getElementById('orderCount').textContent = data.customers.length + ' customer' + (data.customers.length===1?'':'s');
+}
+
+/* ---------- ORDERS (grouped by customer, multiple items each) ---------- */
+const PAY_STATES = [['Unpaid','unpaid'],['Partial','partial'],['Paid','paid']];
+const BOUGHT_STATES = [['Not Yet','notyet'],['Bought','bought']];
+const SHIP_STATES = [['Not Shipped','notshipped'],['In Transit','transit'],['Delivered','delivered']];
+
+function cycle(states, current){
+  const i = states.findIndex(s=>s[0]===current);
+  return states[(i+1) % states.length][0];
+}
+function stampClass(states, current){
+  const found = states.find(s=>s[0]===current);
+  return found ? found[1] : states[0][1];
+}
+
+function customerBalance(c){
+  return c.items.reduce((sum,it)=> sum + (Number(it.sell)||0)*(Number(it.qty)||0), 0);
+}
+function customerMatchesFilter(c, filter){
+  if(filter==='all') return true;
+  if(filter==='unpaid') return (c.payment||'Unpaid')==='Unpaid';
+  if(filter==='partial') return c.payment==='Partial';
+  if(filter==='paid') return c.payment==='Paid';
+  if(filter==='notshipped') return (c.shipping||'Not Shipped')==='Not Shipped';
+  if(filter==='transit') return c.shipping==='In Transit';
+  if(filter==='delivered') return c.shipping==='Delivered';
+  return true;
+}
+function customerMatchesSearch(c, q){
+  if(!q) return true;
+  q = q.toLowerCase();
+  if((c.name||'').toLowerCase().includes(q)) return true;
+  return c.items.some(it=> (it.product||'').toLowerCase().includes(q));
+}
+
+function renderCustomers(){
+  const list = document.getElementById('customerList');
+  const q = (document.getElementById('searchInput').value||'').trim();
+  const filter = document.getElementById('filterSelect').value;
+  const sort = document.getElementById('sortSelect').value;
+
+  let shown = data.customers.filter(c=> customerMatchesSearch(c,q) && customerMatchesFilter(c,filter));
+  shown = shown.slice().sort((a,b)=>{
+    if(sort==='newest') return (b.date||'').localeCompare(a.date||'');
+    if(sort==='oldest') return (a.date||'').localeCompare(b.date||'');
+    if(sort==='balance') return customerBalance(b) - customerBalance(a);
+    if(sort==='name') return (a.name||'').localeCompare(b.name||'');
+    return 0;
+  });
+
+  if(data.customers.length===0){
+    list.innerHTML = `<div style="color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:16px 0;">No customers yet — add one, then add as many items as they ordered.</div>`;
+    return;
+  }
+  if(shown.length===0){
+    list.innerHTML = `<div style="color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:16px 0;">No customers match that search/filter.</div>`;
+    return;
+  }
+
+  list.innerHTML = shown.map(c=>{
+    let subtotal=0;
+    const rows = c.items.map(it=>{
+      const lp = liveP(it.krw), qty=Number(it.qty)||0, sell=Number(it.sell)||0;
+      const markup = sell-lp, total = sell*qty;
+      subtotal += total;
+      const profitClass = markup>=0?'profit-pos':'profit-neg';
+      return `<tr data-item="${it.id}">
+        <td><input class="i-product" value="${esc(it.product)}" placeholder="Item"></td>
+        <td><input class="i-krw num" type="number" value="${it.krw||''}" placeholder="0"></td>
+        <td class="computed">${won(lp)}</td>
+        <td><input class="i-sell num" type="number" value="${it.sell||''}" placeholder="0"></td>
+        <td class="computed ${profitClass}">${peso(markup)}</td>
+        <td><input class="i-qty num" type="number" value="${it.qty||''}" placeholder="0" style="width:50px"></td>
+        <td class="computed">${peso(total)}</td>
+        <td><span class="stamp ${stampClass(BOUGHT_STATES,it.bought)}" data-field="bought">${it.bought||'Not Yet'}</span></td>
+        <td><input class="i-details" value="${esc(it.details)}" placeholder="—"></td>
+        <td><button class="del-btn" title="Remove item">✕</button></td>
+      </tr>`;
+    }).join('');
+    const log = c.log||[];
+    const logHtml = log.slice().reverse().map(l=>`<li><b>${l.ts}</b> — ${esc(l.text)}</li>`).join('') || `<li style="opacity:.6">No activity yet.</li>`;
+    return `<div class="customer-card" data-id="${c.id}">
+      <div class="customer-head">
+        <input class="cname" value="${esc(c.name)}" placeholder="Customer name">
+        <input class="cdate" type="date" value="${c.date||''}" title="Order date">
+        <span class="stamp ${stampClass(PAY_STATES,c.payment)}" data-field="payment">${c.payment||'Unpaid'}</span>
+        <span class="stamp ${stampClass(SHIP_STATES,c.shipping)}" data-field="shipping">${c.shipping||'Not Shipped'}</span>
+        <div class="customer-meta">
+          <span class="customer-subtotal">${c.items.length} item${c.items.length===1?'':'s'} · <b>${peso(subtotal)}</b></span>
+          <button class="del-btn" title="Remove customer">✕</button>
+        </div>
+      </div>
+      <table class="items-table">
+        <thead><tr>
+          <th>Product</th><th>KRW</th><th>Live ₱</th><th>Selling ₱</th><th>Markup</th>
+          <th>Qty</th><th>Total ₱</th><th>Bought?</th><th>Details</th><th></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="item-add-row"><button data-add-item>+ Add item for this customer</button></div>
+      <div class="log-section">
+        <span class="log-toggle" data-log-toggle>▸ Activity &amp; notes (${log.length})</span>
+        <ul class="log-entries" data-log-list>${logHtml}</ul>
+        <div class="log-add" data-log-add>
+          <input type="text" placeholder="Add a note…" data-log-input>
+          <button data-log-submit>Add</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.customer-card').forEach(card=>{
+    const cid = card.dataset.id;
+    const cust = data.customers.find(c=>c.id===cid);
+
+    card.querySelector('.cname').oninput = e=>{ cust.name=e.target.value; scheduleSave(); };
+    card.querySelector('.cdate').onchange = e=>{ cust.date=e.target.value; scheduleSave(); };
+    card.querySelector('[data-field="payment"]').onclick = ()=>{
+      const next = cycle(PAY_STATES,cust.payment||'Unpaid');
+      addLog(cust, `Payment → ${next}`);
+      cust.payment=next; renderCustomers(); scheduleSave();
+    };
+    card.querySelector('[data-field="shipping"]').onclick = ()=>{
+      const next = cycle(SHIP_STATES,cust.shipping||'Not Shipped');
+      addLog(cust, `Shipping → ${next}`);
+      cust.shipping=next; renderCustomers(); scheduleSave();
+    };
+    card.querySelector('.customer-meta .del-btn').onclick = ()=>{
+      if(!confirm(`Remove ${cust.name || 'this customer'} and all their items? This can't be undone.`)) return;
+      data.customers = data.customers.filter(c=>c.id!==cid); renderAll(); scheduleSave();
+    };
+    card.querySelector('[data-add-item]').onclick = ()=>{
+      cust.items.push({id:uid(), product:'', krw:'', sell:'', qty:1, bought:'Not Yet', details:''});
+      renderCustomers(); renderStats(); scheduleSave();
+    };
+
+    const logToggle = card.querySelector('[data-log-toggle]');
+    const logList = card.querySelector('[data-log-list]');
+    const logAdd = card.querySelector('[data-log-add]');
+    logToggle.onclick = ()=>{
+      const open = logList.classList.toggle('open');
+      logAdd.classList.toggle('open', open);
+      logToggle.textContent = (open?'▾':'▸') + ` Activity & notes (${(cust.log||[]).length})`;
+    };
+    const submitNote = ()=>{
+      const input = card.querySelector('[data-log-input]');
+      const text = input.value.trim();
+      if(!text) return;
+      addLog(cust, text);
+      renderCustomers(); scheduleSave();
+    };
+    card.querySelector('[data-log-submit]').onclick = submitNote;
+    card.querySelector('[data-log-input]').onkeydown = e=>{ if(e.key==='Enter'){ submitNote(); } };
+
+    card.querySelectorAll('tbody tr').forEach(row=>{
+      const iid = row.dataset.item;
+      const item = cust.items.find(x=>x.id===iid);
+      row.querySelector('.i-product').oninput = e=>{ item.product=e.target.value; renderStock(); scheduleSave(); };
+      row.querySelector('.i-krw').oninput = e=>{ item.krw=e.target.value; renderStats(); scheduleSave(); };
+      row.querySelector('.i-sell').oninput = e=>{ item.sell=e.target.value; renderStats(); scheduleSave(); };
+      row.querySelector('.i-qty').oninput = e=>{ item.qty=e.target.value; renderStats(); renderStock(); scheduleSave(); };
+      row.querySelector('.i-details').oninput = e=>{ item.details=e.target.value; scheduleSave(); };
+      row.querySelector('[data-field="bought"]').onclick = ()=>{
+        const next = cycle(BOUGHT_STATES,item.bought||'Not Yet');
+        addLog(cust, `${item.product||'Item'} → ${next}`);
+        item.bought=next; renderCustomers(); scheduleSave();
+      };
+      row.querySelector('.del-btn').onclick = ()=>{
+        if(!confirm(`Remove "${item.product || 'this item'}" from ${cust.name || 'this customer'}?`)) return;
+        cust.items = cust.items.filter(x=>x.id!==iid);
+        renderAll(); scheduleSave();
+      };
+    });
+  });
+}
+
+document.getElementById('searchInput').oninput = renderCustomers;
+document.getElementById('filterSelect').onchange = renderCustomers;
+document.getElementById('sortSelect').onchange = renderCustomers;
+
+document.getElementById('addCustomer').onclick = ()=>{
+  data.customers.push({id:uid(), name:'', date: todayStr(), payment:'Unpaid', shipping:'Not Shipped', log:[],
+    items:[{id:uid(), product:'', krw:'', sell:'', qty:1, bought:'Not Yet', details:''}]});
+  renderCustomers(); renderStats(); scheduleSave();
+};
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function nowLabel(){ return new Date().toLocaleString('en-PH',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+function addLog(cust, text){
+  cust.log = cust.log || [];
+  cust.log.push({id:uid(), ts:nowLabel(), text});
+}
+
+/* ---------- STOCK ---------- */
+function renderStock(){
+  const grid = document.getElementById('stockGrid');
+  if(data.stock.length===0){
+    grid.innerHTML = `<div style="grid-column:1/-1;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:20px 0;">No products yet — add stock to track remaining inventory against orders.</div>`;
+    return;
+  }
+  grid.innerHTML = data.stock.map(s=>{
+    const ordered = allItems().filter(it=>(it.product||'').trim().toLowerCase()===(s.product||'').trim().toLowerCase())
+                                .reduce((sum,it)=>sum+(Number(it.qty)||0),0);
+    const remaining = (Number(s.qty)||0) - ordered;
+    return `<div class="stock-card" data-id="${s.id}">
+      <input class="pname" value="${esc(s.product)}" placeholder="Product name">
+      <div class="stock-row"><span>On hand</span><input class="pqty" type="number" value="${s.qty||''}" placeholder="0"></div>
+      <div class="stock-row"><span>Ordered</span><span>${ordered}</span></div>
+      <div class="remaining ${remaining<=0?'low':'ok'}">${remaining} remaining</div>
+      <button class="del-btn" title="Remove">✕</button>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.stock-card').forEach(card=>{
+    const id = card.dataset.id;
+    const s = data.stock.find(x=>x.id===id);
+    card.querySelector('.pname').oninput = e=>{ s.product=e.target.value; renderStock(); scheduleSave(); };
+    card.querySelector('.pqty').oninput = e=>{ s.qty=e.target.value; renderStock(); scheduleSave(); };
+    card.querySelector('.del-btn').onclick = ()=>{
+      if(!confirm(`Remove "${s.product || 'this product'}" from stock?`)) return;
+      data.stock = data.stock.filter(x=>x.id!==id); renderStock(); scheduleSave();
+    };
+  });
+}
+document.getElementById('addStock').onclick = ()=>{
+  data.stock.push({id:uid(), product:'', qty:''});
+  renderStock(); scheduleSave();
+};
+
+/* ---------- EXPENSES ---------- */
+function renderExpenses(){
+  const body = document.getElementById('expensesBody');
+  body.innerHTML = data.expenses.map(e=>`<tr data-id="${e.id}">
+    <td><input class="e-item" value="${esc(e.item)}" placeholder="e.g. Shipping fee"></td>
+    <td><input class="e-krw num" type="number" value="${e.krw||''}" placeholder="0"></td>
+    <td><input class="e-php num" type="number" value="${e.php||''}" placeholder="0"></td>
+    <td><input class="e-notes" value="${esc(e.notes)}" placeholder="—"></td>
+    <td><button class="del-btn" title="Remove">✕</button></td>
+  </tr>`).join('');
+  body.querySelectorAll('tr').forEach(row=>{
+    const id = row.dataset.id;
+    const item = data.expenses.find(x=>x.id===id);
+    row.querySelector('.e-item').oninput = e=>{ item.item=e.target.value; scheduleSave(); };
+    row.querySelector('.e-krw').oninput = e=>{ item.krw=e.target.value; scheduleSave(); };
+    row.querySelector('.e-php').oninput = e=>{ item.php=e.target.value; renderStats(); scheduleSave(); };
+    row.querySelector('.e-notes').oninput = e=>{ item.notes=e.target.value; scheduleSave(); };
+    row.querySelector('.del-btn').onclick = ()=>{
+      if(!confirm(`Remove "${item.item || 'this expense'}"?`)) return;
+      data.expenses = data.expenses.filter(x=>x.id!==id); renderExpenses(); renderStats(); scheduleSave();
+    };
+  });
+}
+document.getElementById('addExpense').onclick = ()=>{
+  data.expenses.push({id:uid(), item:'', krw:'', php:'', notes:''});
+  renderExpenses(); scheduleSave();
+};
+
+function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+/* ---------- TABS ---------- */
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  };
+});
+
+document.getElementById('rateInput').oninput = e=>{
+  data.rate = Number(e.target.value) || 0;
+  renderAll();
+  scheduleSave();
+};
+
+loadData();
+</script>
+</body>
+</html>

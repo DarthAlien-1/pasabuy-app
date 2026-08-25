@@ -27,9 +27,11 @@
     background:var(--bg);
     color:var(--ink);
     font-family:'Inter',sans-serif;
+    font-size:16px;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
+  /* Widened desktop container */
+  .wrap{max-width:1440px;width:95%;margin:0 auto;padding:28px 12px 80px;}
 
   /* ---- header / manifest strip ---- */
   .manifest-border{
@@ -60,7 +62,13 @@
     background:var(--card);border:1px solid var(--line);border-radius:10px;
     padding:10px 14px;display:flex;flex-direction:column;gap:6px;min-width:250px;
   }
-  .rate-box label{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .rate-box label{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .rate-box label .live-tag{
+    color:var(--jade);font-weight:600;font-size:10.5px;
+  }
   .rate-row{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:16px;}
   .rate-row input{
     width:100px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;
@@ -68,7 +76,7 @@
   }
 
   /* ---- summary tags ---- */
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:26px;}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:26px;}
   .stat{
     background:var(--card);border:1px solid var(--line);border-radius:10px;
     padding:14px 16px;position:relative;overflow:hidden;
@@ -83,7 +91,7 @@
   .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;}
   .tab{
     font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.06em;text-transform:uppercase;
-    padding:10px 16px;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;
+    padding:10px 18px;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;
     background:none;border-top:none;border-left:none;border-right:none;
   }
   .tab.active{color:var(--ink);border-bottom-color:var(--red);font-weight:600;}
@@ -93,7 +101,7 @@
 
   /* ---- table ---- */
   .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);}
-  table{border-collapse:collapse;width:100%;min-width:1080px;font-size:15px;}
+  table{border-collapse:collapse;width:100%;min-width:1100px;font-size:15px;}
   th{
     font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
     color:var(--ink-soft);text-align:left;padding:10px 10px;border-bottom:1px solid var(--line);
@@ -116,7 +124,7 @@
   .stamp{
     font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;
     padding:4px 9px;border-radius:999px;border:1.4px solid currentColor;cursor:pointer;
-    display:inline-block;white-space:nowrap;user-select:none;background:transparent;
+    display:inline-block;white-space:nowrap;user-select:none;background:transparent;text-align:center;
   }
   .stamp.paid{color:var(--jade);}
   .stamp.partial{color:var(--gold);}
@@ -137,15 +145,15 @@
     font-family:'IBM Plex Mono',monospace;font-size:16px;
   }
   .add-btn{
-    background:var(--ink);color:#fff;border:none;border-radius:7px;padding:9px 16px;cursor:pointer;
-    font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.03em;
+    background:var(--ink);color:#fff;border:none;border-radius:7px;padding:9px 18px;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:.03em;
   }
   .add-btn:hover{background:var(--navy);}
 
   /* customer groups (orders) */
   .orders-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
   .orders-toolbar input, .orders-toolbar select{
-    font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--ink);
     border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--card);
   }
   #searchInput{flex:1;min-width:180px;}
@@ -154,41 +162,46 @@
     margin-bottom:14px;overflow:hidden;
   }
   .customer-head{
-    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-    padding:12px 14px;background:#F7F7F3;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:10px 14px;background:#F7F7F3;border-bottom:1px solid var(--line);
   }
   .customer-head input.cname{
-    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;
-    border:none;background:none;flex:1;min-width:140px;color:var(--ink);padding:2px 0;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:18px;
+    border:none;background:none;flex:1;min-width:130px;color:var(--ink);padding:2px 0;
   }
   .customer-head input.cname:focus{outline:none;}
   .customer-head input.cdate{
-    font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);
     border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:#fff;
   }
-  .customer-meta{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .head-stamps{display:flex;align-items:center;gap:6px;}
+  .customer-meta{margin-left:auto;display:flex;align-items:center;gap:10px;}
   .customer-subtotal{
-    font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--ink-soft);white-space:nowrap;
   }
   .customer-subtotal b{color:var(--ink);}
-  .items-table{width:100%;border-collapse:collapse;font-size:15px;min-width:760px;}
+  
+  .items-table{width:100%;border-collapse:collapse;font-size:14px;min-width:820px;}
   .items-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .items-table th{
-    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;
-    color:var(--ink-soft);text-align:left;padding:7px 10px;border-bottom:1px solid #EEEFEA;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--ink-soft);text-align:left;padding:7px 8px;border-bottom:1px solid #EEEFEA;
   }
-  .items-table td{padding:6px 10px;border-bottom:1px solid #F2F3EF;}
+  .items-table td{padding:5px 8px;border-bottom:1px solid #F2F3EF;}
   .items-table tr:last-child td{border-bottom:none;}
   .items-table input{
     width:100%;border:1px solid transparent;background:transparent;font-family:'Inter',sans-serif;
-    font-size:15px;padding:5px 6px;border-radius:5px;color:var(--ink);
+    font-size:14px;padding:4px 6px;border-radius:5px;color:var(--ink);
   }
   .items-table input.num{font-family:'IBM Plex Mono',monospace;text-align:right;}
+  .items-table input.i-krw{min-width:65px;}
+  .items-table input.i-sell{min-width:65px;}
+  .items-table input.i-qty{min-width:42px;}
   .items-table input:hover{border-color:var(--line);}
   .items-table input:focus{outline:none;border-color:var(--navy);background:#fff;}
   .item-add-row{padding:8px 14px 12px;}
   .item-add-row button{
-    font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);
     background:none;border:1px dashed var(--line);border-radius:7px;padding:6px 12px;cursor:pointer;
   }
   .item-add-row button:hover{color:var(--ink);border-color:var(--ink-soft);}
@@ -196,14 +209,14 @@
 
   .log-section{border-top:1px solid var(--line);padding:10px 14px 12px;background:#FBFBF8;}
   .log-toggle{
-    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);cursor:pointer;
     letter-spacing:.04em;text-transform:uppercase;user-select:none;
   }
   .log-toggle:hover{color:var(--ink);}
   .log-entries{margin:8px 0;padding:0;list-style:none;display:none;}
   .log-entries.open{display:block;}
   .log-entries li{
-    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);
     padding:3px 0;border-bottom:1px dashed #E5E6DF;
   }
   .log-entries li:last-child{border-bottom:none;}
@@ -211,25 +224,25 @@
   .log-add{display:none;gap:6px;margin-top:8px;}
   .log-add.open{display:flex;}
   .log-add input{
-    flex:1;font-family:'Inter',sans-serif;font-size:16px;border:1px solid var(--line);
+    flex:1;font-family:'Inter',sans-serif;font-size:14px;border:1px solid var(--line);
     border-radius:6px;padding:6px 8px;
   }
   .log-add button{
-    font-family:'IBM Plex Mono',monospace;font-size:13px;border:none;background:var(--ink);
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;border:none;background:var(--ink);
     color:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;
   }
 
   /* stock cards */
-  .stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
   .stock-card{
     background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;position:relative;
   }
   .stock-card input.pname{
-    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:18px;border:none;background:none;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;border:none;background:none;
     width:100%;padding:0 0 6px;color:var(--ink);
   }
   .stock-card input.pname:focus{outline:none;}
-  .stock-row{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--ink-soft);margin-top:6px;}
+  .stock-row{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink-soft);margin-top:6px;}
   .stock-row input.pqty{width:60px;text-align:right;font-family:'IBM Plex Mono',monospace;border:1px solid var(--line);border-radius:5px;padding:2px 5px;}
   .remaining{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;margin-top:8px;}
   .remaining.low{color:var(--red);}
@@ -238,37 +251,49 @@
 
   footer.savebar{
     position:fixed;bottom:0;left:0;right:0;text-align:center;padding:8px;
-    font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);
     background:linear-gradient(to top, var(--bg) 60%, transparent);
   }
 
   ::placeholder{color:#B7BBB0;}
 
-  /* ---- mobile ---- */
+  /* ---- mobile de-cramping ---- */
   @media (max-width: 640px){
-    .wrap{padding:16px 12px 90px;}
-    h1{font-size:29px;}
-    .brand-eyebrow{font-size:12px;}
+    .wrap{width:100%;padding:14px 10px 90px;}
+    h1{font-size:28px;}
+    .brand-eyebrow{font-size:11.5px;}
     header{gap:12px;}
     .rate-box{min-width:0;width:100%;}
     .stats{grid-template-columns:repeat(2,1fr);gap:8px;}
-    .stat{padding:11px 12px;}
-    .stat .value{font-size:19px;}
+    .stat{padding:10px 12px;}
+    .stat .value{font-size:18px;}
     .tabs{gap:0;}
-    .tab{padding:9px 10px;font-size:13px;}
+    .tab{padding:8px 10px;font-size:13px;}
     .orders-toolbar{flex-direction:column;}
-    .orders-toolbar select{width:100%;}
-    .customer-head{flex-direction:column;align-items:stretch;gap:8px;padding:12px;}
-    .customer-head input.cname{font-size:18px;}
-    .customer-meta{width:100%;margin-left:0;justify-content:space-between;}
-    .stamp{padding:7px 11px;font-size:13px;}
-    .del-btn{font-size:20px;padding:6px 10px;}
-    .item-add-row button{width:100%;padding:10px 12px;}
-    .add-btn{width:100%;padding:12px 16px;font-size:15px;}
+    .orders-toolbar select{width:100%;font-size:14px;}
+    .orders-toolbar input{font-size:14px;}
+    
+    .customer-head{
+      flex-direction:column;align-items:stretch;gap:8px;padding:10px 12px;
+    }
+    .customer-head input.cname{font-size:17px;}
+    .customer-head input.cdate{width:100%;font-size:13px;padding:6px 8px;}
+    .head-stamps{display:flex;width:100%;gap:6px;}
+    .head-stamps .stamp{flex:1;padding:6px 4px;font-size:11px;}
+    .customer-meta{width:100%;margin-left:0;justify-content:space-between;padding-top:2px;}
+    
+    .del-btn{font-size:18px;padding:4px 8px;}
+    .item-add-row button{width:100%;padding:8px 12px;font-size:13px;}
+    .add-btn{width:100%;padding:10px 14px;font-size:14px;}
     .stock-grid{grid-template-columns:1fr;}
     .log-add{flex-direction:column;align-items:stretch;}
-    .log-add button{padding:9px 12px;}
-    table:not(.items-table){min-width:640px;}
+    .log-add button{padding:8px 12px;}
+    
+    .items-table{min-width:720px;font-size:13.5px;}
+    .items-table th{font-size:10.5px;padding:6px 6px;}
+    .items-table td{padding:4px 6px;}
+    .items-table input{font-size:13.5px;padding:4px 3px;}
+    table:not(.items-table){min-width:600px;}
   }
 </style>
 </head>
@@ -283,7 +308,7 @@
       <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);margin-top:4px;">Shared tracker</div>
     </div>
     <div class="rate-box">
-      <label>Today's Rate</label>
+      <label>Today's Rate <span class="live-tag" id="rateLiveTag">● Live FX</span></label>
       <div class="rate-row">
         <span>₩100 =</span>
         <span>₱</span>
@@ -370,6 +395,19 @@ function uid(){ return Math.random().toString(36).slice(2,9); }
 function peso(n){ return '₱' + (isFinite(n)?n:0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function won(n){ return '₩' + Math.round(isFinite(n)?n:0).toLocaleString('en-US'); }
 
+async function fetchLiveRate(){
+  try{
+    const res = await fetch('https://open.er-api.com/v6/latest/KRW');
+    const json = await res.json();
+    if(json && json.rates && json.rates.PHP){
+      return Number((json.rates.PHP * 100).toFixed(2));
+    }
+  }catch(e){
+    console.warn('Could not fetch real-time rate, using saved rate.');
+  }
+  return null;
+}
+
 async function loadData(){
   try{
     const res = await fetch('/api/data');
@@ -378,10 +416,20 @@ async function loadData(){
       data = Object.assign({customers:[],stock:[],expenses:[],rate:4.46}, json.value);
     }
   }catch(e){ setStatus('Could not reach server — check your connection and reload.'); }
+
+  const liveRate = await fetchLiveRate();
+  const tag = document.getElementById('rateLiveTag');
+  if(liveRate){
+    data.rate = liveRate;
+    if(tag) tag.style.display = 'inline';
+  } else {
+    if(tag) tag.style.display = 'none';
+  }
+
   migrateIfNeeded();
   document.getElementById('rateInput').value = data.rate;
   renderAll();
-  setStatus('Loaded.');
+  setStatus(liveRate ? 'Loaded (Live FX synced).' : 'Loaded.');
 }
 
 function scheduleSave(){
@@ -427,7 +475,7 @@ function renderStats(){
     }
   });
   data.expenses.forEach(e=>{ 
-    const phpVal = e.php !== '' && e.php !== null && e.php !== undefined ? Number(e.php) : liveP(e.krw);
+    const phpVal = (e.php !== '' && e.php !== null && e.php !== undefined) ? Number(e.php) : liveP(e.krw);
     totalExpenses += Number(phpVal)||0; 
   });
 
@@ -528,8 +576,10 @@ function renderCustomers(){
       <div class="customer-head">
         <input class="cname" value="${esc(c.name)}" placeholder="Customer name">
         <input class="cdate" type="date" value="${c.date||''}" title="Order date">
-        <span class="stamp ${stampClass(PAY_STATES,c.payment)}" data-field="payment">${c.payment||'Unpaid'}</span>
-        <span class="stamp ${stampClass(SHIP_STATES,c.shipping)}" data-field="shipping">${c.shipping||'Not Shipped'}</span>
+        <div class="head-stamps">
+          <span class="stamp ${stampClass(PAY_STATES,c.payment)}" data-field="payment">${c.payment||'Unpaid'}</span>
+          <span class="stamp ${stampClass(SHIP_STATES,c.shipping)}" data-field="shipping">${c.shipping||'Not Shipped'}</span>
+        </div>
         <div class="customer-meta">
           <span class="customer-subtotal">${c.items.length} item${c.items.length===1?'':'s'} · <b>${peso(subtotal)}</b></span>
           <button class="del-btn" title="Remove customer">✕</button>
@@ -716,6 +766,8 @@ document.querySelectorAll('.tab').forEach(btn=>{
 
 document.getElementById('rateInput').oninput = e=>{
   data.rate = Number(e.target.value) || 0;
+  const tag = document.getElementById('rateLiveTag');
+  if(tag) tag.style.display = 'none';
   renderAll();
   scheduleSave();
 };

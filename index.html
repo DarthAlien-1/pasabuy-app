@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Korea Pasabuy — Manifest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -170,7 +171,8 @@
     font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);
   }
   .customer-subtotal b{color:var(--ink);}
-  .items-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .items-table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px;}
+  .items-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .items-table th{
     font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;
     color:var(--ink-soft);text-align:left;padding:7px 10px;border-bottom:1px solid #EEEFEA;
@@ -241,6 +243,33 @@
   }
 
   ::placeholder{color:#B7BBB0;}
+
+  /* ---- mobile ---- */
+  @media (max-width: 640px){
+    .wrap{padding:16px 12px 90px;}
+    h1{font-size:26px;}
+    .brand-eyebrow{font-size:10px;}
+    header{gap:12px;}
+    .rate-box{min-width:0;width:100%;}
+    .stats{grid-template-columns:repeat(2,1fr);gap:8px;}
+    .stat{padding:11px 12px;}
+    .stat .value{font-size:17px;}
+    .tabs{gap:0;}
+    .tab{padding:9px 10px;font-size:11px;}
+    .orders-toolbar{flex-direction:column;}
+    .orders-toolbar select{width:100%;}
+    .customer-head{flex-direction:column;align-items:stretch;gap:8px;padding:12px;}
+    .customer-head input.cname{font-size:15px;}
+    .customer-meta{width:100%;margin-left:0;justify-content:space-between;}
+    .stamp{padding:7px 11px;font-size:11px;}
+    .del-btn{font-size:18px;padding:6px 10px;}
+    .item-add-row button{width:100%;padding:10px 12px;}
+    .add-btn{width:100%;padding:12px 16px;font-size:13px;}
+    .stock-grid{grid-template-columns:1fr;}
+    .log-add{flex-direction:column;align-items:stretch;}
+    .log-add button{padding:9px 12px;}
+    table:not(.items-table){min-width:640px;}
+  }
 </style>
 </head>
 <body>
@@ -503,13 +532,15 @@ function renderCustomers(){
           <button class="del-btn" title="Remove customer">✕</button>
         </div>
       </div>
-      <table class="items-table">
-        <thead><tr>
-          <th>Product</th><th>KRW</th><th>Live ₱</th><th>Selling ₱</th><th>Markup</th>
-          <th>Qty</th><th>Total ₱</th><th>Bought?</th><th>Details</th><th></th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+      <div class="items-scroll">
+        <table class="items-table">
+          <thead><tr>
+            <th>Product</th><th>KRW</th><th>Live ₱</th><th>Selling ₱</th><th>Markup</th>
+            <th>Qty</th><th>Total ₱</th><th>Bought?</th><th>Details</th><th></th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
       <div class="item-add-row"><button data-add-item>+ Add item for this customer</button></div>
       <div class="log-section">
         <span class="log-toggle" data-log-toggle>▸ Activity &amp; notes (${log.length})</span>

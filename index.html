@@ -287,7 +287,7 @@
       <div class="rate-row">
         <span>₩100 =</span>
         <span>₱</span>
-        <input type="number" step="0.01" id="rateInput" value="0.045">
+        <input type="number" step="0.01" id="rateInput" value="4.46">
       </div>
     </div>
   </header>
@@ -341,10 +341,9 @@
 <footer class="savebar" id="saveStatus">Loaded.</footer>
 
 <script>
-let data = { customers: [], stock: [], expenses: [], rate: 41.5 };
+let data = { customers: [], stock: [], expenses: [], rate: 4.46 };
 let saveTimer = null;
 
-// migrate old flat "orders" shape (one row per item, no grouping) into customers[]
 function migrateIfNeeded(){
   if(data.orders && data.orders.length && (!data.customers || data.customers.length===0)){
     const byName = {};
@@ -376,7 +375,7 @@ async function loadData(){
     const res = await fetch('/api/data');
     const json = await res.json();
     if(json && json.value){
-      data = Object.assign({customers:[],stock:[],expenses:[],rate:41.5}, json.value);
+      data = Object.assign({customers:[],stock:[],expenses:[],rate:4.46}, json.value);
     }
   }catch(e){ setStatus('Could not reach server — check your connection and reload.'); }
   migrateIfNeeded();
@@ -401,7 +400,7 @@ function scheduleSave(){
 }
 function setStatus(msg){ document.getElementById('saveStatus').textContent = msg; }
 
-function liveP(krw){ return (Number(krw)||0) * (data.rate/1000); }
+function liveP(krw){ return (Number(krw)||0) * (data.rate/100); }
 
 function renderAll(){
   renderStats();
@@ -411,7 +410,6 @@ function renderAll(){
 }
 
 function allItems(){
-  // flat list of {..item, customerName} across every customer, for stats/stock matching
   const out = [];
   data.customers.forEach(c=> c.items.forEach(it=> out.push(Object.assign({}, it, {_customer:c}))));
   return out;
@@ -423,10 +421,15 @@ function renderStats(){
     const lp = liveP(it.krw), qty = Number(it.qty)||0, sell = Number(it.sell)||0;
     totalProfit += (sell - lp) * qty;
     totalPasabuy += sell * qty;
-    totalKrwPurchased += (Number(it.krw)||0) * qty;
-    totalPhpPurchased += lp * qty;
+    if(it.bought === 'Bought'){
+      totalKrwPurchased += (Number(it.krw)||0) * qty;
+      totalPhpPurchased += lp * qty;
+    }
   });
-  data.expenses.forEach(e=>{ totalExpenses += Number(e.php)||0; });
+  data.expenses.forEach(e=>{ 
+    const phpVal = e.php !== '' && e.php !== null && e.php !== undefined ? Number(e.php) : liveP(e.krw);
+    totalExpenses += Number(phpVal)||0; 
+  });
 
   const stats = [
     {label:'Total Profit', value:peso(totalProfit), accent:'var(--jade)'},
@@ -441,7 +444,7 @@ function renderStats(){
   document.getElementById('orderCount').textContent = data.customers.length + ' customer' + (data.customers.length===1?'':'s');
 }
 
-/* ---------- ORDERS (grouped by customer, multiple items each) ---------- */
+/* ---------- ORDERS ---------- */
 const PAY_STATES = [['Unpaid','unpaid'],['Partial','partial'],['Paid','paid']];
 const BOUGHT_STATES = [['Not Yet','notyet'],['Bought','bought']];
 const SHIP_STATES = [['Not Shipped','notshipped'],['In Transit','transit'],['Delivered','delivered']];
@@ -509,7 +512,7 @@ function renderCustomers(){
       return `<tr data-item="${it.id}">
         <td><input class="i-product" value="${esc(it.product)}" placeholder="Item"></td>
         <td><input class="i-krw num" type="number" value="${it.krw||''}" placeholder="0"></td>
-        <td class="computed">${won(lp)}</td>
+        <td class="computed">${peso(lp)}</td>
         <td><input class="i-sell num" type="number" value="${it.sell||''}" placeholder="0"></td>
         <td class="computed ${profitClass}">${peso(markup)}</td>
         <td><input class="i-qty num" type="number" value="${it.qty||''}" placeholder="0" style="width:50px"></td>
@@ -600,14 +603,14 @@ function renderCustomers(){
       const iid = row.dataset.item;
       const item = cust.items.find(x=>x.id===iid);
       row.querySelector('.i-product').oninput = e=>{ item.product=e.target.value; renderStock(); scheduleSave(); };
-      row.querySelector('.i-krw').oninput = e=>{ item.krw=e.target.value; renderStats(); scheduleSave(); };
-      row.querySelector('.i-sell').oninput = e=>{ item.sell=e.target.value; renderStats(); scheduleSave(); };
-      row.querySelector('.i-qty').oninput = e=>{ item.qty=e.target.value; renderStats(); renderStock(); scheduleSave(); };
+      row.querySelector('.i-krw').oninput = e=>{ item.krw=e.target.value; renderAll(); scheduleSave(); };
+      row.querySelector('.i-sell').oninput = e=>{ item.sell=e.target.value; renderAll(); scheduleSave(); };
+      row.querySelector('.i-qty').oninput = e=>{ item.qty=e.target.value; renderAll(); scheduleSave(); };
       row.querySelector('.i-details').oninput = e=>{ item.details=e.target.value; scheduleSave(); };
       row.querySelector('[data-field="bought"]').onclick = ()=>{
         const next = cycle(BOUGHT_STATES,item.bought||'Not Yet');
         addLog(cust, `${item.product||'Item'} → ${next}`);
-        item.bought=next; renderCustomers(); scheduleSave();
+        item.bought=next; renderCustomers(); renderStats(); scheduleSave();
       };
       row.querySelector('.del-btn').onclick = ()=>{
         if(!confirm(`Remove "${item.product || 'this item'}" from ${cust.name || 'this customer'}?`)) return;
@@ -685,7 +688,7 @@ function renderExpenses(){
     const id = row.dataset.id;
     const item = data.expenses.find(x=>x.id===id);
     row.querySelector('.e-item').oninput = e=>{ item.item=e.target.value; scheduleSave(); };
-    row.querySelector('.e-krw').oninput = e=>{ item.krw=e.target.value; scheduleSave(); };
+    row.querySelector('.e-krw').oninput = e=>{ item.krw=e.target.value; renderStats(); scheduleSave(); };
     row.querySelector('.e-php').oninput = e=>{ item.php=e.target.value; renderStats(); scheduleSave(); };
     row.querySelector('.e-notes').oninput = e=>{ item.notes=e.target.value; scheduleSave(); };
     row.querySelector('.del-btn').onclick = ()=>{

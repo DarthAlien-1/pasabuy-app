@@ -456,6 +456,7 @@ async function loadData(){
 
   migrateIfNeeded();
   document.getElementById('rateInput').value = data.rate;
+  lastSyncedJSON = JSON.stringify(data);
   renderAll();
   setStatus(liveRate ? 'Loaded (Live FX synced).' : 'Loaded.');
 }
@@ -470,11 +471,59 @@ function scheduleSave(){
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
       });
+      lastSyncedJSON = JSON.stringify(data);
       setStatus(res.ok ? 'Saved · ' + new Date().toLocaleTimeString() : 'Save failed');
     }catch(e){ setStatus('Save failed — check your connection'); }
+    saveTimer = null;
   }, 450);
 }
 function setStatus(msg){ document.getElementById('saveStatus').textContent = msg; }
+
+/* ---------- REAL-TIME SYNC (polling) ---------- */
+let lastSyncedJSON = null;
+const POLL_INTERVAL_MS = 5000;
+let pollTimer = null;
+
+function isEditing(){
+  const el = document.activeElement;
+  if(!el) return false;
+  const tag = el.tagName;
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+}
+
+async function pollForUpdates(){
+  // don't fetch mid-typing or while our own save is still in flight
+  if(isEditing() || saveTimer) return;
+  try{
+    const res = await fetch('/api/data');
+    const json = await res.json();
+    if(!json || !json.value) return;
+    const remoteJSON = JSON.stringify(json.value);
+    if(remoteJSON !== lastSyncedJSON){
+      data = Object.assign({customers:[],stock:[],expenses:[],rate:data.rate}, json.value);
+      lastSyncedJSON = remoteJSON;
+      renderAll();
+      setStatus('Synced · ' + new Date().toLocaleTimeString());
+    }
+  }catch(e){ /* silent — next poll will retry */ }
+}
+
+function startPolling(){
+  stopPolling();
+  pollTimer = setInterval(pollForUpdates, POLL_INTERVAL_MS);
+}
+function stopPolling(){
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = null;
+}
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible'){
+    pollForUpdates();
+    startPolling();
+  } else {
+    stopPolling();
+  }
+});
 
 function liveP(krw){ return (Number(krw)||0) * (data.rate/100); }
 
@@ -800,7 +849,7 @@ document.getElementById('rateInput').oninput = e=>{
   scheduleSave();
 };
 
-loadData();
+loadData().then(startPolling);
 </script>
 </body>
 </html>

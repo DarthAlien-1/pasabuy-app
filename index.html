@@ -115,9 +115,29 @@
     background:none;border-top:none;border-left:none;border-right:none;
   }
   .tab.active{color:var(--ink);border-bottom-color:var(--red);font-weight:600;}
+  .tab-badge{
+    display:inline-block;min-width:16px;padding:1px 5px;margin-left:4px;border-radius:999px;
+    background:var(--red);color:#fff;font-size:10px;line-height:15px;text-align:center;
+  }
+  .tab-badge.zero{background:var(--line);color:var(--ink-soft);}
 
   section{display:none;}
   section.active{display:block;}
+
+  .tobuy-summary{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);
+    margin-bottom:14px;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:9px;
+  }
+  .tobuy-summary b{color:var(--ink);font-family:'Space Grotesk',sans-serif;font-size:14.5px;}
+  .tobuy-row{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;margin-bottom:8px;
+  }
+  .tobuy-product{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;}
+  .tobuy-meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+  .tobuy-row button.stamp{color:var(--jade);flex-shrink:0;cursor:pointer;}
+  .empty-note{color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:20px 4px;text-align:center;}
 
   /* ---- table ---- */
   .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);}
@@ -334,6 +354,8 @@
     .items-table input.i-product{text-align:left;}
     .items-table input.i-qty{width:70px !important;}
     table:not(.items-table){min-width:600px;}
+    .tobuy-row{flex-direction:column;align-items:stretch;gap:8px;}
+    .tobuy-row button.stamp{width:100%;text-align:center;padding:9px 12px;}
   }
 </style>
 </head>
@@ -369,6 +391,7 @@
 
   <div class="tabs">
     <button class="tab active" data-tab="orders">Orders</button>
+    <button class="tab" data-tab="tobuy">To Buy <span id="tobuyCount" class="tab-badge">0</span></button>
     <button class="tab" data-tab="stock">Stock</button>
     <button class="tab" data-tab="expenses">Red's Gastos</button>
   </div>
@@ -394,6 +417,11 @@
     </div>
     <div id="customerList"></div>
     <div class="add-row"><button class="add-btn" id="addCustomer">+ Add customer</button></div>
+  </section>
+
+  <section id="tobuy">
+    <div class="tobuy-summary" id="tobuySummary"></div>
+    <div id="tobuyList"></div>
   </section>
 
   <section id="stock">
@@ -550,6 +578,7 @@ function liveP(krw){ return (Number(krw)||0) * (data.rate/100); }
 function renderAll(){
   renderStats();
   renderCustomers();
+  renderToBuy();
   renderStock();
   renderExpenses();
 }
@@ -558,6 +587,60 @@ function allItems(){
   const out = [];
   data.customers.forEach(c=> c.items.forEach(it=> out.push(Object.assign({}, it, {_customer:c}))));
   return out;
+}
+
+/* ---------- TO BUY ---------- */
+function renderToBuy(){
+  const summary = document.getElementById('tobuySummary');
+  const list = document.getElementById('tobuyList');
+  const badge = document.getElementById('tobuyCount');
+  if(!summary || !list) return;
+
+  const pending = [];
+  data.customers.forEach(c=> c.items.forEach(it=>{
+    if((it.bought||'Not Yet') !== 'Bought') pending.push({item:it, customer:c});
+  }));
+  // oldest order date first — the ones waited on longest surface at the top
+  pending.sort((a,b)=> (a.customer.date||'').localeCompare(b.customer.date||''));
+
+  badge.textContent = pending.length;
+  badge.classList.toggle('zero', pending.length===0);
+
+  const totalKrw = pending.reduce((sum,p)=> sum + (Number(p.item.krw)||0)*(Number(p.item.qty)||0), 0);
+  summary.innerHTML = pending.length
+    ? `<b>${pending.length}</b> item${pending.length===1?'':'s'} still to buy · roughly <b>${won(totalKrw)}</b> total`
+    : `Nothing pending — everything's been purchased.`;
+
+  if(pending.length===0){
+    list.innerHTML = `<div class="empty-note">🎉 Nothing left on the shopping list.</div>`;
+    return;
+  }
+
+  list.innerHTML = pending.map(p=>{
+    const it=p.item, c=p.customer;
+    const qty = Number(it.qty)||0;
+    return `<div class="tobuy-row" data-cid="${c.id}" data-iid="${it.id}">
+      <div class="tobuy-main">
+        <div class="tobuy-product">${esc(it.product)||'<em style="color:var(--ink-soft)">Unnamed item</em>'}</div>
+        <div class="tobuy-meta">${esc(c.name)||'Unnamed customer'} · Qty ${qty} · ${won(it.krw)}${it.details ? ' · '+esc(it.details) : ''}</div>
+      </div>
+      <button class="stamp" data-mark-bought>Mark bought</button>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('[data-mark-bought]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const row = btn.closest('.tobuy-row');
+      const cust = data.customers.find(c=>c.id===row.dataset.cid);
+      if(!cust) return;
+      const item = cust.items.find(i=>i.id===row.dataset.iid);
+      if(!item) return;
+      item.bought = 'Bought';
+      addLog(cust, `${item.product||'Item'} → Bought`);
+      renderAll();
+      scheduleSave();
+    };
+  });
 }
 
 function renderStats(){

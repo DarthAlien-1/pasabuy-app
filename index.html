@@ -309,10 +309,30 @@
     .log-add{flex-direction:column;align-items:stretch;}
     .log-add button{padding:8px 12px;}
     
-    .items-table{min-width:720px;font-size:13.5px;}
-    .items-table th{font-size:10.5px;padding:6px 6px;}
-    .items-table td{padding:4px 6px;}
-    .items-table input{font-size:13.5px;padding:4px 3px;}
+    .items-scroll{overflow-x:visible;}
+    .items-table{min-width:0;width:100%;font-size:13.5px;}
+    .items-table thead{display:none;}
+    .items-table, .items-table tbody{display:block;width:100%;}
+    .items-table tr{
+      display:block;width:100%;border:1px solid var(--line);border-radius:9px;
+      margin-bottom:10px;padding:4px 10px;background:#fff;
+    }
+    .items-table tr:last-child{margin-bottom:0;}
+    .items-table td{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:7px 0;border-bottom:1px solid #F1F2EC;
+    }
+    .items-table tr td:last-child{border-bottom:none;padding-top:9px;}
+    .items-table td::before{
+      content:attr(data-label);
+      font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+      color:var(--ink-soft);flex-shrink:0;
+    }
+    .items-table td[data-label=""]::before{content:none;}
+    .items-table td[data-label=""]{justify-content:flex-end;}
+    .items-table input{text-align:right;font-size:13.5px;padding:4px 3px;}
+    .items-table input.i-product{text-align:left;}
+    .items-table input.i-qty{width:70px !important;}
     table:not(.items-table){min-width:600px;}
   }
 </style>
@@ -635,16 +655,16 @@ function renderCustomers(){
       subtotal += total;
       const profitClass = markup>=0?'profit-pos':'profit-neg';
       return `<tr data-item="${it.id}">
-        <td><input class="i-product" value="${esc(it.product)}" placeholder="Item"></td>
-        <td><input class="i-krw num" type="number" value="${it.krw||''}" placeholder="0"></td>
-        <td class="computed">${peso(lp)}</td>
-        <td><input class="i-sell num" type="number" value="${it.sell||''}" placeholder="0"></td>
-        <td class="computed ${profitClass}">${peso(markup)}</td>
-        <td><input class="i-qty num" type="number" value="${it.qty||''}" placeholder="0" style="width:50px"></td>
-        <td class="computed">${peso(total)}</td>
-        <td><span class="stamp ${stampClass(BOUGHT_STATES,it.bought)}" data-field="bought">${it.bought||'Not Yet'}</span></td>
-        <td><input class="i-details" value="${esc(it.details)}" placeholder="—"></td>
-        <td><button class="del-btn" title="Remove item">✕</button></td>
+        <td data-label="Product"><input class="i-product" value="${esc(it.product)}" placeholder="Item"></td>
+        <td data-label="KRW"><input class="i-krw num" type="number" value="${it.krw||''}" placeholder="0"></td>
+        <td data-label="Live ₱" class="computed">${peso(lp)}</td>
+        <td data-label="Selling ₱"><input class="i-sell num" type="number" value="${it.sell||''}" placeholder="0"></td>
+        <td data-label="Markup" class="computed ${profitClass}">${peso(markup)}</td>
+        <td data-label="Qty"><input class="i-qty num" type="number" value="${it.qty||''}" placeholder="0" style="width:50px"></td>
+        <td data-label="Total ₱" class="computed">${peso(total)}</td>
+        <td data-label="Bought?"><span class="stamp ${stampClass(BOUGHT_STATES,it.bought)}" data-field="bought">${it.bought||'Not Yet'}</span></td>
+        <td data-label="Details"><input class="i-details" value="${esc(it.details)}" placeholder="—"></td>
+        <td data-label=""><button class="del-btn" title="Remove item">✕</button></td>
       </tr>`;
     }).join('');
     const log = c.log||[];

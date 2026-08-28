@@ -129,6 +129,13 @@
     margin-bottom:14px;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:9px;
   }
   .tobuy-summary b{color:var(--ink);font-family:'Space Grotesk',sans-serif;font-size:14.5px;}
+  .tobuy-group{margin-bottom:18px;}
+  .tobuy-group-head{
+    display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    padding:0 2px 8px;border-bottom:1px solid var(--line);margin-bottom:8px;
+  }
+  .tobuy-group-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;}
+  .tobuy-group-meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);}
   .tobuy-row{
     display:flex;justify-content:space-between;align-items:center;gap:12px;
     background:var(--card);border:1px solid var(--line);border-radius:10px;
@@ -184,6 +191,7 @@
     display:flex;align-items:center;gap:8px;margin-top:12px;
     font-family:'IBM Plex Mono',monospace;font-size:16px;
   }
+  .add-row-top{margin-top:0;margin-bottom:14px;}
   .add-btn{
     background:var(--ink);color:#fff;border:none;border-radius:7px;padding:9px 18px;cursor:pointer;
     font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:.03em;
@@ -355,6 +363,7 @@
     .items-table input.i-qty{width:70px !important;}
     table:not(.items-table){min-width:600px;}
     .tobuy-row{flex-direction:column;align-items:stretch;gap:8px;}
+    .tobuy-group-head{flex-wrap:wrap;}
     .tobuy-row button.stamp{width:100%;text-align:center;padding:9px 12px;}
   }
 </style>
@@ -397,6 +406,7 @@
   </div>
 
   <section id="orders" class="active">
+    <div class="add-row add-row-top"><button class="add-btn" id="addCustomer">+ Add customer</button></div>
     <div class="orders-toolbar">
       <input type="text" id="searchInput" placeholder="Search customer or item…">
       <select id="filterSelect">
@@ -416,7 +426,6 @@
       </select>
     </div>
     <div id="customerList"></div>
-    <div class="add-row"><button class="add-btn" id="addCustomer">+ Add customer</button></div>
   </section>
 
   <section id="tobuy">
@@ -440,6 +449,7 @@
   </section>
 </div>
 <footer class="savebar" id="saveStatus">Loaded.</footer>
+<datalist id="productCatalogList"></datalist>
 
 <script>
 let data = { customers: [], stock: [], expenses: [], rate: 4.46 };
@@ -460,9 +470,12 @@ function migrateIfNeeded(){
     data.customers = order;
   }
   if(!data.customers) data.customers = [];
-  data.customers.forEach(c=>{
+  data.customers.forEach((c,i)=>{
     if(!c.date) c.date = '';
     if(!c.log) c.log = [];
+    // backfill createdAt for existing records so sort has a real tiebreaker;
+    // spaced 1ms apart in original array order so "oldest" stays stable
+    if(!c.createdAt) c.createdAt = Date.now() - (data.customers.length - i) * 1000;
   });
   delete data.orders;
 }
@@ -581,12 +594,37 @@ function renderAll(){
   renderToBuy();
   renderStock();
   renderExpenses();
+  renderProductDatalist();
 }
 
 function allItems(){
   const out = [];
   data.customers.forEach(c=> c.items.forEach(it=> out.push(Object.assign({}, it, {_customer:c}))));
   return out;
+}
+
+/* ---------- PRODUCT CATALOG (autocomplete + remembered pricing) ---------- */
+function productCatalog(){
+  // last-entered price per product name wins — walks customers in stored order
+  const map = {};
+  data.customers.forEach(c=> c.items.forEach(it=>{
+    const key = (it.product||'').trim().toLowerCase();
+    if(!key) return;
+    if(!Number(it.krw) && !Number(it.sell)) return;
+    map[key] = { name: it.product.trim(), krw: it.krw, sell: it.sell };
+  }));
+  return map;
+}
+function renderProductDatalist(){
+  const dl = document.getElementById('productCatalogList');
+  if(!dl) return;
+  const names = new Set();
+  data.customers.forEach(c=> c.items.forEach(it=>{
+    const n = (it.product||'').trim();
+    if(n) names.add(n);
+  }));
+  dl.innerHTML = Array.from(names).sort((a,b)=>a.localeCompare(b))
+    .map(n=>`<option value="${esc(n)}">`).join('');
 }
 
 /* ---------- TO BUY ---------- */
@@ -600,8 +638,6 @@ function renderToBuy(){
   data.customers.forEach(c=> c.items.forEach(it=>{
     if((it.bought||'Not Yet') !== 'Bought') pending.push({item:it, customer:c});
   }));
-  // oldest order date first — the ones waited on longest surface at the top
-  pending.sort((a,b)=> (a.customer.date||'').localeCompare(b.customer.date||''));
 
   badge.textContent = pending.length;
   badge.classList.toggle('zero', pending.length===0);
@@ -616,15 +652,37 @@ function renderToBuy(){
     return;
   }
 
-  list.innerHTML = pending.map(p=>{
-    const it=p.item, c=p.customer;
-    const qty = Number(it.qty)||0;
-    return `<div class="tobuy-row" data-cid="${c.id}" data-iid="${it.id}">
-      <div class="tobuy-main">
-        <div class="tobuy-product">${esc(it.product)||'<em style="color:var(--ink-soft)">Unnamed item</em>'}</div>
-        <div class="tobuy-meta">${esc(c.name)||'Unnamed customer'} · Qty ${qty} · ${won(it.krw)}${it.details ? ' · '+esc(it.details) : ''}</div>
+  // group by customer; customers waiting longest (oldest createdAt) rise to the top
+  const groups = [];
+  const byId = {};
+  pending.forEach(p=>{
+    if(!byId[p.customer.id]){
+      byId[p.customer.id] = { customer: p.customer, items: [] };
+      groups.push(byId[p.customer.id]);
+    }
+    byId[p.customer.id].items.push(p.item);
+  });
+  groups.sort((a,b)=> (a.customer.createdAt||0) - (b.customer.createdAt||0));
+
+  list.innerHTML = groups.map(g=>{
+    const c = g.customer;
+    const groupKrw = g.items.reduce((sum,it)=> sum + (Number(it.krw)||0)*(Number(it.qty)||0), 0);
+    const rows = g.items.map(it=>{
+      const qty = Number(it.qty)||0;
+      return `<div class="tobuy-row" data-cid="${c.id}" data-iid="${it.id}">
+        <div class="tobuy-main">
+          <div class="tobuy-product">${esc(it.product)||'<em style="color:var(--ink-soft)">Unnamed item</em>'}</div>
+          <div class="tobuy-meta">Qty ${qty} · ${won(it.krw)}${it.details ? ' · '+esc(it.details) : ''}</div>
+        </div>
+        <button class="stamp" data-mark-bought>Mark bought</button>
+      </div>`;
+    }).join('');
+    return `<div class="tobuy-group">
+      <div class="tobuy-group-head">
+        <span class="tobuy-group-name">${esc(c.name)||'Unnamed customer'}</span>
+        <span class="tobuy-group-meta">${g.items.length} item${g.items.length===1?'':'s'} · ${won(groupKrw)}</span>
       </div>
-      <button class="stamp" data-mark-bought>Mark bought</button>
+      ${rows}
     </div>`;
   }).join('');
 
@@ -714,8 +772,8 @@ function renderCustomers(){
 
   let shown = data.customers.filter(c=> customerMatchesSearch(c,q) && customerMatchesFilter(c,filter));
   shown = shown.slice().sort((a,b)=>{
-    if(sort==='newest') return (b.date||'').localeCompare(a.date||'');
-    if(sort==='oldest') return (a.date||'').localeCompare(b.date||'');
+    if(sort==='newest') return (b.createdAt||0) - (a.createdAt||0);
+    if(sort==='oldest') return (a.createdAt||0) - (b.createdAt||0);
     if(sort==='balance') return customerBalance(b) - customerBalance(a);
     if(sort==='name') return (a.name||'').localeCompare(b.name||'');
     return 0;
@@ -738,7 +796,7 @@ function renderCustomers(){
       subtotal += total;
       const profitClass = markup>=0?'profit-pos':'profit-neg';
       return `<tr data-item="${it.id}">
-        <td data-label="Product"><input class="i-product" value="${esc(it.product)}" placeholder="Item"></td>
+        <td data-label="Product"><input class="i-product" list="productCatalogList" autocomplete="off" value="${esc(it.product)}" placeholder="Item"></td>
         <td data-label="KRW"><input class="i-krw num" type="number" value="${it.krw||''}" placeholder="0"></td>
         <td data-label="Live ₱" class="computed">${peso(lp)}</td>
         <td data-label="Selling ₱"><input class="i-sell num" type="number" value="${it.sell||''}" placeholder="0"></td>
@@ -832,7 +890,25 @@ function renderCustomers(){
     card.querySelectorAll('tbody tr').forEach(row=>{
       const iid = row.dataset.item;
       const item = cust.items.find(x=>x.id===iid);
-      row.querySelector('.i-product').oninput = e=>{ item.product=e.target.value; renderStock(); scheduleSave(); };
+      row.querySelector('.i-product').oninput = e=>{
+        item.product = e.target.value;
+        // if this matches a known product and no price entered yet, borrow its last price
+        const key = e.target.value.trim().toLowerCase();
+        if(key && !item.krw && !item.sell){
+          const match = productCatalog()[key];
+          if(match){
+            item.krw = match.krw;
+            item.sell = match.sell;
+            const krwInput = row.querySelector('.i-krw');
+            const sellInput = row.querySelector('.i-sell');
+            if(krwInput) krwInput.value = match.krw || '';
+            if(sellInput) sellInput.value = match.sell || '';
+            renderStats();
+          }
+        }
+        renderStock();
+        scheduleSave();
+      };
       row.querySelector('.i-krw').oninput = e=>{ item.krw=e.target.value; renderStats(); scheduleSave(); };
       row.querySelector('.i-sell').oninput = e=>{ item.sell=e.target.value; renderStats(); scheduleSave(); };
       row.querySelector('.i-qty').oninput = e=>{ item.qty=e.target.value; renderStats(); renderStock(); scheduleSave(); };
@@ -856,9 +932,11 @@ document.getElementById('filterSelect').onchange = renderCustomers;
 document.getElementById('sortSelect').onchange = renderCustomers;
 
 document.getElementById('addCustomer').onclick = ()=>{
-  data.customers.push({id:uid(), name:'', date: todayStr(), payment:'Unpaid', shipping:'Not Shipped', log:[],
+  data.customers.push({id:uid(), name:'', date: todayStr(), createdAt: Date.now(), payment:'Unpaid', shipping:'Not Shipped', log:[],
     items:[{id:uid(), product:'', krw:'', sell:'', qty:1, bought:'Not Yet', details:''}]});
+  document.getElementById('sortSelect').value = 'newest';
   renderCustomers(); renderStats(); scheduleSave();
+  window.scrollTo({top:0, behavior:'smooth'});
 };
 
 function todayStr(){ return new Date().toISOString().slice(0,10); }
